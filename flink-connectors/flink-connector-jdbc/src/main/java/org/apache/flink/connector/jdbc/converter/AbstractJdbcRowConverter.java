@@ -162,7 +162,11 @@ public abstract class AbstractJdbcRowConverter implements JdbcRowConverter {
                                         new BigDecimal((BigInteger) val, 0), precision, scale)
                                 : DecimalData.fromBigDecimal((BigDecimal) val, precision, scale);
             case DATE:
-                return val -> (int) (((Date) val).toLocalDate().toEpochDay());
+                return val ->
+                        val instanceof Timestamp
+                                ? (int) (new Date(((Timestamp) val).getTime()))
+                                        .toLocalDate().toEpochDay()
+                                : (int) (((Date) val).toLocalDate().toEpochDay());
             case TIME_WITHOUT_TIME_ZONE:
                 return val -> (int) (((Time) val).toLocalTime().toNanoOfDay() / 1_000_000L);
             case TIMESTAMP_WITH_TIME_ZONE:
